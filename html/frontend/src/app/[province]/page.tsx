@@ -1,21 +1,38 @@
 "use client";
 
 import { useQuery } from "@apollo/client";
+import { notFound } from "next/navigation";
 import { useState } from "react";
-import { Button } from "../components/atoms/Button/Button";
-import { MainLayout } from "../components/layouts/MainLayout";
-import { SearchBox } from "../components/molecules/SearchBox/SearchBox";
-import { PropertyList } from "../components/organisms/PropertyList/PropertyList";
-import { GET_PROPERTIES } from "../graphql/queries";
-import { PropertySortKey, SortOrder } from "../types/property";
+import { Button } from "../../components/atoms/Button/Button";
+import { MainLayout } from "../../components/layouts/MainLayout";
+import { SearchBox } from "../../components/molecules/SearchBox/SearchBox";
+import { PropertyList } from "../../components/organisms/PropertyList/PropertyList";
+import { GET_PROPERTIES } from "../../graphql/queries";
+import { PropertySortKey, SortOrder } from "../../types/property";
 
-export default function Home() {
+interface ProvincePageProps {
+  params: {
+    province: string;
+  };
+}
+
+// This would typically come from your backend
+const VALID_PROVINCES = ["bangkok", "nonthaburi", "pathum-thani"]; // Add all valid provinces
+
+export default function ProvincePage({ params }: ProvincePageProps) {
+  const province = params.province.toLowerCase();
+
+  if (!VALID_PROVINCES.includes(province)) {
+    notFound();
+  }
+
   const [filter, setFilter] = useState({
     page: 1,
     limit: 25,
     sortKey: PropertySortKey.CREATED_AT,
     sortOrder: SortOrder.DESC,
     search: "",
+    province,
   });
 
   const { loading, error, data } = useQuery(GET_PROPERTIES, {
@@ -53,6 +70,10 @@ export default function Home() {
   return (
     <MainLayout>
       <div className="space-y-6">
+        <h2 className="text-2xl font-semibold capitalize mb-6">
+          Properties in {province}
+        </h2>
+
         <div className="mb-8">
           <SearchBox onSearch={handleSearch} />
         </div>

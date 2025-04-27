@@ -1,11 +1,11 @@
 <?php
 return [
 
-  'paths' => ['api/*', 'graphql'],
+  'paths' => ['api/*', 'graphql', 'sanctum/csrf-cookie'],
 
   'allowed_methods' => ['*'],
 
-  'allowed_origins' => ['http://localhost:3000'], // หรือระบุ origin ที่ใช้เช่น ['http://localhost:3000']
+  'allowed_origins' => ['http://localhost:3000'],
 
   'allowed_origins_patterns' => [],
 
@@ -15,6 +15,6 @@ return [
 
   'max_age' => 0,
 
-  'supports_credentials' => false,
+  'supports_credentials' => true,
 
 ];

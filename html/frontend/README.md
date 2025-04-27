@@ -34,3 +34,12 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+# Acceptance Criteria #1
+
+Frontend built with Vue.js or React.
+Display all relevant property information from the properties.json file.
+Implement pagination with clear links to navigate through results (25 properties per page).
+Include a search box for filtering properties by title and location (consider using string matching and location matching algorithms).
+Allow sorting of properties by price (ascending/descending) and date listed (newest first/oldest first).
+Implement dynamic routing that displays properties based on selected provinces (e.g., /bangkok/). Handle non-existent provinces with a 404 error page.
