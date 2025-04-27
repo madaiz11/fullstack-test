@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Services;
 
+use App\DTOs\PropertiesFilterDTO;
 use App\Models\Property;
 use App\Models\Location;
 use App\Services\PropertyService;
@@ -50,11 +51,11 @@ class PropertyServiceTest extends TestCase
         ]);
         Property::factory()->create(['title' => 'Mountain Cabin']);
 
-        $filter = [
-            'search' => 'beach',
-            'page' => 1,
-            'limit' => 12
-        ];
+        $filter = new PropertiesFilterDTO(
+            search: 'beach',
+            page: 1,
+            limit: 12
+        );
 
         $result = $this->propertyService->getFilteredProperties($filter);
 
@@ -70,11 +71,11 @@ class PropertyServiceTest extends TestCase
         ]);
         Property::factory()->create();
 
-        $filter = [
-            'search' => 'bangkok',
-            'page' => 1,
-            'limit' => 12
-        ];
+        $filter = new PropertiesFilterDTO(
+            search: 'bangkok',
+            page: 1,
+            limit: 12
+        );
 
         $result = $this->propertyService->getFilteredProperties($filter);
 
@@ -88,12 +89,12 @@ class PropertyServiceTest extends TestCase
         Property::factory()->create(['price' => 2000000]);
         Property::factory()->create(['price' => 500000]);
 
-        $filter = [
-            'sortKey' => 'PRICE',
-            'sortOrder' => 'DESC',
-            'page' => 1,
-            'limit' => 12
-        ];
+        $filter = new PropertiesFilterDTO(
+            sortKey: 'PRICE',
+            sortOrder: 'DESC',
+            page: 1,
+            limit: 12
+        );
 
         $result = $this->propertyService->getFilteredProperties($filter);
 
@@ -107,10 +108,10 @@ class PropertyServiceTest extends TestCase
     {
         Property::factory()->count(15)->create();
 
-        $filter = [
-            'page' => 2,
-            'limit' => 10
-        ];
+        $filter = new PropertiesFilterDTO(
+            page: 2,
+            limit: 10
+        );
 
         $result = $this->propertyService->getFilteredProperties($filter);
 
@@ -124,11 +125,11 @@ class PropertyServiceTest extends TestCase
     {
         Property::factory()->count(5)->create();
 
-        $filter = [
-            'search' => 'test',
-            'sortKey' => 'PRICE',
-            'sortOrder' => 'ASC'
-        ];
+        $filter = new PropertiesFilterDTO(
+            search: 'test',
+            sortKey: 'PRICE',
+            sortOrder: 'ASC'
+        );
 
         $query = $this->propertyService->getFilteredQuery($filter);
 

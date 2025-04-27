@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\DTOs\PropertiesFilterDTO;
 use App\Models\Property;
 use App\Services\Interfaces\PropertyServiceInterface;
 use Illuminate\Database\Eloquent\Builder;
@@ -27,31 +28,28 @@ class PropertyService implements PropertyServiceInterface
     /**
      * @inheritDoc
      */
-    public function getFilteredProperties(array $filter): array
+    public function getFilteredProperties(PropertiesFilterDTO $filter): array
     {
-        $page = $filter['page'] ?? 1;
-        $limit = $filter['limit'] ?? 12;
-        
         $query = $this->getFilteredQuery($filter);
 
         // Execute pagination
         $total = $query->count();
-        $items = $query->skip(($page - 1) * $limit)
-                      ->take($limit)
+        $items = $query->skip(($filter->page - 1) * $filter->limit)
+                      ->take($filter->limit)
                       ->get();
 
-        $lastPage = ceil($total / $limit);
+        $lastPage = ceil($total / $filter->limit);
 
         return [
             'data' => $items,
             'paginatorInfo' => [
                 'count' => $items->count(),
-                'currentPage' => $page,
-                'firstItem' => $items->first() ? ($page - 1) * $limit + 1 : null,
-                'hasMorePages' => $page < $lastPage,
-                'lastItem' => $items->count() > 0 ? ($page - 1) * $limit + $items->count() : null,
+                'currentPage' => $filter->page,
+                'firstItem' => $items->first() ? ($filter->page - 1) * $filter->limit + 1 : null,
+                'hasMorePages' => $filter->page < $lastPage,
+                'lastItem' => $items->count() > 0 ? ($filter->page - 1) * $filter->limit + $items->count() : null,
                 'lastPage' => $lastPage,
-                'perPage' => $limit,
+                'perPage' => $filter->limit,
                 'total' => $total
             ]
         ];
@@ -60,13 +58,13 @@ class PropertyService implements PropertyServiceInterface
     /**
      * @inheritDoc
      */
-    public function getFilteredQuery(array $filter): Builder
+    public function getFilteredQuery(PropertiesFilterDTO $filter): Builder
     {
         $query = Property::query();
 
         // Apply search filter if provided
-        if (isset($filter['search']) && !empty($filter['search'])) {
-            $searchTerm = "%" . trim(strtolower($filter['search'])) . "%";
+        if ($filter->search) {
+            $searchTerm = "%" . trim(strtolower($filter->search)) . "%";
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('title', 'like', $searchTerm)
                     ->orWhereHas('location', function ($l) use ($searchTerm) {
@@ -75,16 +73,13 @@ class PropertyService implements PropertyServiceInterface
             });
         }
 
-        if (isset($filter['province']) && !empty($filter['province'])) {
+        if ($filter->province) {
             $query->whereHas('location', function ($l) use ($filter) {
-                $l->where('province', $filter['province']);
+                $l->where('province', $filter->province);
             });
         }
 
         // Apply sorting
-        $sortKey = $filter['sortKey'] ?? 'CREATED_AT';
-        $sortOrder = $filter['sortOrder'] ?? 'DESC';
-        
         $columnMap = [
             'TITLE' => 'title',
             'PRICE' => 'price',
@@ -92,8 +87,8 @@ class PropertyService implements PropertyServiceInterface
             'CREATED_AT' => 'created_at'
         ];
 
-        $column = $columnMap[$sortKey] ?? 'created_at';
-        $direction = $sortOrder === 'ASC' ? 'asc' : 'desc';
+        $column = $columnMap[$filter->sortKey] ?? 'created_at';
+        $direction = $filter->sortOrder === 'ASC' ? 'asc' : 'desc';
         
         $query->orderBy($column, $direction);
 

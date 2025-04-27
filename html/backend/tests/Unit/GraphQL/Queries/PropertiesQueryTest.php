@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\GraphQL\Queries;
 
+use App\DTOs\PropertiesFilterDTO;
 use App\GraphQL\Queries\PropertiesQuery;
 use App\Services\Interfaces\PropertyServiceInterface;
 use App\Services\Validators\PropertyFilterValidator;
@@ -39,7 +40,7 @@ class PropertiesQueryTest extends TestCase
 
     public function test_invoke_with_valid_filter()
     {
-        $filter = [
+        $filterArray = [
             'search' => 'test',
             'page' => 1,
             'limit' => 12
@@ -57,15 +58,15 @@ class PropertiesQueryTest extends TestCase
 
         $this->validator->shouldReceive('validate')
             ->once()
-            ->with($filter)
+            ->with($filterArray)
             ->andReturn(true);
 
         $this->propertyService->shouldReceive('getFilteredProperties')
             ->once()
-            ->with($filter)
+            ->with(Mockery::type(PropertiesFilterDTO::class))
             ->andReturn($expectedResult);
 
-        $result = ($this->query)(null, ['filter' => $filter], $this->context, $this->resolveInfo);
+        $result = ($this->query)(null, ['filter' => $filterArray], $this->context, $this->resolveInfo);
 
         $this->assertEquals($expectedResult, $result);
     }
@@ -112,7 +113,7 @@ class PropertiesQueryTest extends TestCase
 
         $this->propertyService->shouldReceive('getFilteredProperties')
             ->once()
-            ->with([])
+            ->with(Mockery::type(PropertiesFilterDTO::class))
             ->andReturn($expectedResult);
 
         $result = ($this->query)(null, [], $this->context, $this->resolveInfo);
@@ -122,7 +123,7 @@ class PropertiesQueryTest extends TestCase
 
     public function test_invoke_with_default_values()
     {
-        $filter = [
+        $filterArray = [
             'page' => 1,
             'limit' => 12,
             'sortKey' => 'CREATED_AT',
@@ -141,15 +142,15 @@ class PropertiesQueryTest extends TestCase
 
         $this->validator->shouldReceive('validate')
             ->once()
-            ->with($filter)
+            ->with($filterArray)
             ->andReturn(true);
 
         $this->propertyService->shouldReceive('getFilteredProperties')
             ->once()
-            ->with($filter)
+            ->with(Mockery::type(PropertiesFilterDTO::class))
             ->andReturn($expectedResult);
 
-        $result = ($this->query)(null, ['filter' => $filter], $this->context, $this->resolveInfo);
+        $result = ($this->query)(null, ['filter' => $filterArray], $this->context, $this->resolveInfo);
 
         $this->assertEquals($expectedResult, $result);
     }

@@ -2,6 +2,7 @@
 
 namespace App\GraphQL\Queries;
 
+use App\DTOs\PropertiesFilterDTO;
 use App\Services\Interfaces\PropertyServiceInterface;
 use App\Services\Validators\PropertyFilterValidator;
 use GraphQL\Error\Error;
@@ -33,13 +34,15 @@ class PropertiesQuery
      */
     public function __invoke($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {
-        // TODO: Map to DTO
-        $filter = $args['filter'] ?? [];
+        $filterArray = $args['filter'] ?? [];
 
         // Validate filter
-        if (!$this->validator->validate($filter)) {
+        if (!$this->validator->validate($filterArray)) {
             throw new Error('Invalid filter parameters: ' . $this->validator->getError());
         }
+
+        // Map to DTO
+        $filter = PropertiesFilterDTO::fromArray($filterArray);
 
         return $this->propertyService->getFilteredProperties($filter);
     }

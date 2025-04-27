@@ -2,21 +2,24 @@
 
 namespace App\Services\Interfaces;
 
+use App\DTOs\PropertiesFilterDTO;
+use Illuminate\Database\Eloquent\Builder;
+
 interface PropertyServiceInterface extends ServiceInterface
 {
     /**
      * Get filtered properties with pagination
      *
-     * @param array $filter
+     * @param PropertiesFilterDTO $filter
      * @return array
      */
-    public function getFilteredProperties(array $filter): array;
+    public function getFilteredProperties(PropertiesFilterDTO $filter): array;
 
     /**
      * Get property query builder with applied filters
      *
-     * @param array $filter
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param PropertiesFilterDTO $filter
+     * @return Builder
      */
-    public function getFilteredQuery(array $filter): \Illuminate\Database\Eloquent\Builder;
+    public function getFilteredQuery(PropertiesFilterDTO $filter): Builder;
 } 
