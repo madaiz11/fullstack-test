@@ -12,7 +12,16 @@ class PropertyTypeFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->randomElement(PropertyType::TYPES),
+            'name' => $this->faker->randomElement([
+                'home',
+                'condo',
+                'townhouse',
+                'land',
+                'shophouse',
+                'office',
+                'apartment',
+                'hotel'
+            ]),
         ];
     }
 } 

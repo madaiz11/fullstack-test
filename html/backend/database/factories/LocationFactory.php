@@ -12,11 +12,11 @@ class LocationFactory extends Factory
     public function definition(): array
     {
         return [
-            'full_name' => fake()->address(),
-            'zipcode' => fake()->postcode(),
-            'province' => fake()->city(),
-            'sub_district' => fake()->city(),
-            'district' => fake()->city(),
+            'full_name' => $this->faker->city(),
+            'zipcode' => $this->faker->numerify('#####'),
+            'province' => $this->faker->city(),
+            'sub_district' => $this->faker->city(),
+            'district' => $this->faker->city(),
         ];
     }
 } 
