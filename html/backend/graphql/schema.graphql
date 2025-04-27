@@ -4,57 +4,16 @@ scalar DateTime
 
 "Indicates what fields are available at the top level of a query operation."
 type Query {
-    "Find a single user by an identifying attribute."
-    user(
-        "Search by primary key."
-        id: ID @eq @rules(apply: ["prohibits:email", "required_without:email"])
-
-        "Search by email address."
-        email: String
-            @eq
-            @rules(apply: ["prohibits:id", "required_without:id", "email"])
-    ): User @find
-
-    "List multiple users."
-    users(
-        "Filters by name. Accepts SQL LIKE wildcards `%` and `_`."
-        name: String @where(operator: "like")
-    ): [User!]! @paginate(defaultCount: 10)
-
-    """
-    Get all locations
-    """
-    locations: [Location!]! @all
-
-    """
-    Get a specific location by ID
-    """
-    location(id: ID! @eq): Location @find
-
-    """
-    Get all property types
-    """
-    propertyTypes: [PropertyType!]! @all
-
-    """
-    Get a specific property type by ID
-    """
-    propertyType(id: ID! @eq): PropertyType @find
-
-    """
-    Get all properties with optional filters
-    """
-    properties(
-        status: PropertyStatus @eq
-        propertyType: PropertyTypeEnum @eq
-        minPrice: Int @where(operator: ">=", key: "price")
-        maxPrice: Int @where(operator: "<=", key: "price")
-    ): [Property!]! @paginate
-
     """
     Get a specific property by ID
     """
     property(id: ID! @eq): Property @find
+
+    """
+    Get all properties with filtering, pagination and sorting
+    """
+    properties(filter: PropertyFilterInput): PropertyPaginatorResult!
+        @field(resolver: "App\\GraphQL\\Queries\\PropertiesQuery")
 }
 
 "Account of a person who utilizes this application."
@@ -167,44 +126,40 @@ enum PropertyAttributeEnum {
     SHUTTLE_SERVICE @enum(value: "shuttle service")
 }
 
-type Mutation {
-    """
-    Create a new location
-    """
-    createLocation(
-        full_name: String!
-        zipcode: String
-        province: String
-        sub_district: String
-        district: String
-    ): Location! @create
+# Add these input types at the top level
+input PropertyFilterInput {
+    search: String
+    page: Int = 1
+    limit: Int = 12
+    sortKey: PropertySortKey = CREATED_AT
+    sortOrder: SortOrder = DESC
+}
 
-    """
-    Create a new property
-    """
-    createProperty(
-        title: String!
-        description: String
-        size_w: Float
-        size_h: Float
-        price: Int!
-        date_listed: DateTime!
-        status: PropertyStatus!
-        location_id: ID!
-        property_type_id: ID!
-    ): Property! @create
+enum PropertySortKey {
+    TITLE
+    PRICE
+    DATE_LISTED
+    CREATED_AT
+}
 
-    """
-    Add an attribute to a property
-    """
-    addPropertyAttribute(
-        property_id: ID!
-        name: PropertyAttributeEnum!
-        amount: Int! = 1
-    ): PropertyAttribute! @create
+enum SortOrder {
+    ASC
+    DESC
+}
 
-    """
-    Update a property's status
-    """
-    updatePropertyStatus(id: ID!, status: PropertyStatus!): Property! @update
+# Add the paginator result type
+type PropertyPaginatorResult {
+    data: [Property!]!
+    paginatorInfo: PaginatorInfo!
+}
+
+type PaginatorInfo {
+    count: Int!
+    currentPage: Int!
+    firstItem: Int
+    hasMorePages: Boolean!
+    lastItem: Int
+    lastPage: Int!
+    perPage: Int!
+    total: Int!
 }
