@@ -1,0 +1,210 @@
+"A datetime string with format `Y-m-d H:i:s`, e.g. `2018-05-23 13:43:32`."
+scalar DateTime
+    @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+
+"Indicates what fields are available at the top level of a query operation."
+type Query {
+    "Find a single user by an identifying attribute."
+    user(
+        "Search by primary key."
+        id: ID @eq @rules(apply: ["prohibits:email", "required_without:email"])
+
+        "Search by email address."
+        email: String
+            @eq
+            @rules(apply: ["prohibits:id", "required_without:id", "email"])
+    ): User @find
+
+    "List multiple users."
+    users(
+        "Filters by name. Accepts SQL LIKE wildcards `%` and `_`."
+        name: String @where(operator: "like")
+    ): [User!]! @paginate(defaultCount: 10)
+
+    """
+    Get all locations
+    """
+    locations: [Location!]! @all
+
+    """
+    Get a specific location by ID
+    """
+    location(id: ID! @eq): Location @find
+
+    """
+    Get all property types
+    """
+    propertyTypes: [PropertyType!]! @all
+
+    """
+    Get a specific property type by ID
+    """
+    propertyType(id: ID! @eq): PropertyType @find
+
+    """
+    Get all properties with optional filters
+    """
+    properties(
+        status: PropertyStatus @eq
+        propertyType: PropertyTypeEnum @eq
+        minPrice: Int @where(operator: ">=", key: "price")
+        maxPrice: Int @where(operator: "<=", key: "price")
+    ): [Property!]! @paginate
+
+    """
+    Get a specific property by ID
+    """
+    property(id: ID! @eq): Property @find
+}
+
+"Account of a person who utilizes this application."
+type User {
+    "Unique primary key."
+    id: ID!
+
+    "Non-unique name."
+    name: String!
+
+    "Unique email address."
+    email: String!
+
+    "When the email was verified."
+    email_verified_at: DateTime
+
+    "When the account was created."
+    created_at: DateTime!
+
+    "When the account was last updated."
+    updated_at: DateTime!
+}
+
+"""
+A Location represents a geographical area where properties are located
+"""
+type Location {
+    id: ID!
+    full_name: String!
+    zipcode: String
+    province: String
+    sub_district: String
+    district: String
+    properties: [Property!]! @hasMany
+}
+
+"""
+A PropertyType represents the category of a property
+"""
+type PropertyType {
+    id: ID!
+    name: String!
+    properties: [Property!]! @hasMany
+}
+
+"""
+A Property represents a real estate listing
+"""
+type Property {
+    id: ID!
+    title: String!
+    description: String
+    size_w: Float
+    size_h: Float
+    price: Int!
+    date_listed: DateTime!
+    created_at: DateTime!
+    updated_at: DateTime!
+    status: PropertyStatus!
+    location: Location! @belongsTo
+    propertyType: PropertyType! @belongsTo
+    attributes: [PropertyAttribute!]! @hasMany
+}
+
+"""
+A PropertyAttribute represents additional features of a property
+"""
+type PropertyAttribute {
+    id: ID!
+    property: Property! @belongsTo
+    name: String!
+    amount: Int!
+}
+
+"""
+Available property statuses
+"""
+enum PropertyStatus {
+    FORSALE @enum(value: "forsale")
+    SOLD @enum(value: "sold")
+}
+
+"""
+Available property types
+"""
+enum PropertyTypeEnum {
+    HOME @enum(value: "home")
+    CONDO @enum(value: "condo")
+    TOWNHOUSE @enum(value: "townhouse")
+    LAND @enum(value: "land")
+    SHOPHOUSE @enum(value: "shophouse")
+    OFFICE @enum(value: "office")
+    APARTMENT @enum(value: "apartment")
+    HOTEL @enum(value: "hotel")
+}
+
+"""
+Available property attributes
+"""
+enum PropertyAttributeEnum {
+    AIRCONDITIONER @enum(value: "airconditioner")
+    WARDROBEROOM @enum(value: "wardroberoom")
+    LIFT @enum(value: "lift")
+    PARKING @enum(value: "parking")
+    FITNESS @enum(value: "fitness")
+    JAGUCCI @enum(value: "jagucci")
+    SWIMMINGPOOL @enum(value: "swimmingpool")
+    PARK_AREA @enum(value: "park area")
+    CCTV @enum(value: "cctv")
+    SHUTTLE_SERVICE @enum(value: "shuttle service")
+}
+
+type Mutation {
+    """
+    Create a new location
+    """
+    createLocation(
+        full_name: String!
+        zipcode: String
+        province: String
+        sub_district: String
+        district: String
+    ): Location! @create
+
+    """
+    Create a new property
+    """
+    createProperty(
+        title: String!
+        description: String
+        size_w: Float
+        size_h: Float
+        price: Int!
+        date_listed: DateTime!
+        status: PropertyStatus!
+        location_id: ID!
+        property_type_id: ID!
+    ): Property! @create
+
+    """
+    Add an attribute to a property
+    """
+    addPropertyAttribute(
+        property_id: ID!
+        name: PropertyAttributeEnum!
+        amount: Int! = 1
+    ): PropertyAttribute! @create
+
+    """
+    Update a property's status
+    """
+    updatePropertyStatus(id: ID!, status: PropertyStatus!): Property! @update
+}
