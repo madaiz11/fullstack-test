@@ -1,4 +1,8 @@
+"use client";
+
+import Link from "next/link";
 import React from "react";
+import { ProvinceSelector } from "../molecules/ProvinceSelector/ProvinceSelector";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -9,11 +13,15 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4">
-          <h1 className="text-2xl font-bold text-gray-900">
-            Property Listings
-          </h1>
+          <Link href="/" className="block">
+            <h1 className="text-2xl font-bold text-gray-900">
+              Property Listings
+            </h1>
+          </Link>
         </div>
       </header>
+
+      <ProvinceSelector />
 
       <main className="container mx-auto px-4 py-8">{children}</main>
 

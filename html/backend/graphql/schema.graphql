@@ -133,6 +133,7 @@ input PropertyFilterInput {
     limit: Int = 12
     sortKey: PropertySortKey = CREATED_AT
     sortOrder: SortOrder = DESC
+    province: String
 }
 
 enum PropertySortKey {

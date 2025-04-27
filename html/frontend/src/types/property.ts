@@ -56,4 +56,5 @@ export interface PropertyFilterInput {
   limit?: number;
   sortKey?: PropertySortKey;
   sortOrder?: SortOrder;
+  province?: string;
 }

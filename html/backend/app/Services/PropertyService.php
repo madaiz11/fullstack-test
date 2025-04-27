@@ -75,6 +75,12 @@ class PropertyService implements PropertyServiceInterface
             });
         }
 
+        if (isset($filter['province']) && !empty($filter['province'])) {
+            $query->whereHas('location', function ($l) use ($filter) {
+                $l->where('province', $filter['province']);
+            });
+        }
+
         // Apply sorting
         $sortKey = $filter['sortKey'] ?? 'CREATED_AT';
         $sortOrder = $filter['sortOrder'] ?? 'DESC';

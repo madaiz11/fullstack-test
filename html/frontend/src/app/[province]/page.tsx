@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { useState } from "react";
 import { Button } from "../../components/atoms/Button/Button";
 import { MainLayout } from "../../components/layouts/MainLayout";
+import { VALID_PROVINCES } from "../../components/molecules/ProvinceSelector/ProvinceSelector";
 import { SearchBox } from "../../components/molecules/SearchBox/SearchBox";
 import { PropertyList } from "../../components/organisms/PropertyList/PropertyList";
 import { GET_PROPERTIES } from "../../graphql/queries";
@@ -16,13 +17,12 @@ interface ProvincePageProps {
   };
 }
 
-// This would typically come from your backend
-const VALID_PROVINCES = ["bangkok", "nonthaburi", "pathum-thani"]; // Add all valid provinces
-
 export default function ProvincePage({ params }: ProvincePageProps) {
   const province = params.province.toLowerCase();
+  const provinceData = VALID_PROVINCES.find((p) => p.id === province);
 
-  if (!VALID_PROVINCES.includes(province)) {
+  // If province is not in our valid list, show 404
+  if (!provinceData) {
     notFound();
   }
 
@@ -32,7 +32,7 @@ export default function ProvincePage({ params }: ProvincePageProps) {
     sortKey: PropertySortKey.CREATED_AT,
     sortOrder: SortOrder.DESC,
     search: "",
-    province,
+    province: provinceData.name,
   });
 
   const { loading, error, data } = useQuery(GET_PROPERTIES, {
@@ -71,7 +71,7 @@ export default function ProvincePage({ params }: ProvincePageProps) {
     <MainLayout>
       <div className="space-y-6">
         <h2 className="text-2xl font-semibold capitalize mb-6">
-          Properties in {province}
+          Properties in {provinceData.name}
         </h2>
 
         <div className="mb-8">

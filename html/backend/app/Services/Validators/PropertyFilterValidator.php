@@ -13,6 +13,7 @@ class PropertyFilterValidator extends AbstractValidator
             'search' => new SearchValidator(),
             'pagination' => new PaginationValidator(),
             'sort' => new SortValidator(),
+            'province' => new ProvinceValidator(),
         ];
     }
 
@@ -55,6 +56,14 @@ class PropertyFilterValidator extends AbstractValidator
         if (!$this->validators['sort']->validate($sortData)) {
             $this->errors['sort'] = $this->validators['sort']->getError();
             $isValid = false;
+        }
+
+        if (isset($value['province'])) {
+            $provinceValidator = $this->validators['province'];
+            if (!$provinceValidator->validate($value['province'])) {
+                $this->errors['province'] = $provinceValidator->getError();
+                $isValid = false;
+            }
         }
 
         if (!$isValid) {
