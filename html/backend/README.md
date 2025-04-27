@@ -62,159 +62,182 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 # Property Storage API
 
+A Laravel-based GraphQL API for managing property listings with search, sort, and pagination capabilities.
+
 ## Overview
 
-A Laravel-based REST API for managing property listings with search, sort, and pagination capabilities.
+This project uses Laravel Sail, a light-weight command-line interface for interacting with Laravel's default Docker development environment. It provides an excellent starting point for building a Laravel application using PHP, MySQL, and other services.
 
 ## Features
 
+-   GraphQL API for property listings
 -   Property listing retrieval with pagination (25 items per page)
 -   Search functionality for properties by title and location
 -   Sorting capabilities by price and date listed
 -   Comprehensive error handling
 -   Unit and Feature tests
 
-## Requirements
+## Dependencies
 
--   PHP 8.1 or higher
--   Composer
--   MySQL/PostgreSQL
--   Laravel 10.x
+### Core Dependencies
 
-## Installation
+-   PHP ^8.2
+-   Laravel Framework ^12.0
+-   Laravel Tinker ^2.10.1
+-   Lighthouse (GraphQL) ^6.54
+-   Spatie Laravel Data ^4.15
 
-1. Clone the repository
-2. Install dependencies:
+### Development Dependencies
+
+-   Laravel Sail ^1.41
+-   PHPUnit ^11.5.3
+-   Laravel Pint ^1.13
+-   Laravel Pail ^1.2.2
+-   Faker ^1.23
+-   Mockery ^1.6
+-   Collision ^8.6
+
+## Prerequisites
+
+### System Requirements
+
+-   Docker Desktop
+    -   Windows/macOS: [Docker Desktop](https://www.docker.com/products/docker-desktop)
+    -   Linux: Docker Engine and Docker Compose
+-   Minimum 4GB RAM (8GB recommended)
+-   Git
+
+### Development Tools
+
+-   Composer (for initial setup)
+-   IDE with PHP support (recommended: PHPStorm or VS Code)
+-   A GraphQL client (e.g., GraphiQL, Insomnia, or Postman)
+
+## Installation with Sail
+
+1. Clone the repository:
+
+    ```bash
+    git clone <repository-url>
+    cd html/backend
+    ```
+
+2. Install Composer dependencies (using Docker):
+
+    ```bash
+    docker run --rm \
+        -u "$(id -u):$(id -g)" \
+        -v "$(pwd):/var/www/html" \
+        -w /var/www/html \
+        composer install --ignore-platform-reqs
+    ```
+
+3. Copy environment file:
+
+    ```bash
+    cp .env.example .env
+    ```
+
+4. Start Laravel Sail:
+
+    ```bash
+    ./vendor/bin/sail up -d
+    ```
+
+5. Generate application key:
+
+    ```bash
+    ./vendor/bin/sail artisan key:generate
+    ```
+
+6. Run migrations:
+
+    ```bash
+    ./vendor/bin/sail artisan migrate
+    ```
+
+7. (Optional) Seed the database:
+    ```bash
+    ./vendor/bin/sail artisan db:seed
+    ```
+
+## Common Sail Commands
 
 ```bash
-composer install
+# Start all containers
+./vendor/bin/sail up -d
+
+# Stop all containers
+./vendor/bin/sail down
+
+# Run tests
+./vendor/bin/sail test
+
+# Run artisan commands
+./vendor/bin/sail artisan <command>
+
+# Access MySQL CLI
+./vendor/bin/sail mysql
+
+# View logs
+./vendor/bin/sail logs
+
+# Run composer commands
+./vendor/bin/sail composer <command>
+
+# Run Node commands
+./vendor/bin/sail npm <command>
 ```
 
-3. Copy `.env.example` to `.env` and configure your database:
+## GraphQL API
 
-```bash
-cp .env.example .env
+### Endpoint
+
+```
+http://localhost/graphql
 ```
 
-4. Generate application key:
+### Available Queries
 
-```bash
-php artisan key:generate
-```
-
-5. Run migrations:
-
-```bash
-php artisan migrate
-```
-
-6. (Optional) Seed the database:
-
-```bash
-php artisan db:seed
-```
-
-## API Endpoints
-
-### GET /api/properties
-
-Retrieve a paginated list of properties with optional search and sort parameters.
-
-#### Query Parameters
-
--   `search`: (optional) Search term for property title or location
--   `sort_by`: (optional) Field to sort by (`price` or `date_listed`)
--   `sort_direction`: (optional) Sort direction (`asc` or `desc`)
-
-#### Response Format
-
-```json
-{
-    "data": [
-        {
-            "id": 1,
-            "title": "Property Title",
-            "price": 100000,
-            "date_listed": "2024-03-20",
-            "location": {
-                "full_name": "Location Name",
-                "province": "Province",
-                "district": "District",
-                "sub_district": "Sub District",
-                "zipcode": "12345"
-            }
-        }
-    ],
-    "meta": {
-        "current_page": 1,
-        "last_page": 4,
-        "per_page": 25,
-        "total": 100
-    }
-}
-```
+-   `properties`: Fetch paginated property listings
+    -   Parameters:
+        -   `filter`: Object containing search and sort parameters
+            -   `search`: (optional) Search term for property title or location
+            -   `sortKey`: (optional) Field to sort by (`PRICE` or `CREATED_AT`)
+            -   `sortOrder`: (optional) Sort direction (`ASC` or `DESC`)
+            -   `page`: (optional) Page number
+            -   `limit`: (optional) Items per page
+            -   `province`: (optional) Filter by province
 
 ## Testing
 
-Run the test suite:
+Run the test suite using Sail:
 
 ```bash
-php artisan test
+./vendor/bin/sail test
 ```
 
 ### Test Coverage
 
--   **Feature Tests**: Test API endpoints and response structure
--   **Unit Tests**: Test service layer and business logic
--   **Test Cases**:
+-   Feature Tests: Test GraphQL endpoints and response structure
+-   Unit Tests: Test service layer and business logic
+-   Test Cases:
     -   Pagination functionality
     -   Search functionality
     -   Sorting functionality
     -   Error handling
     -   Input validation
 
-## Acceptance Criteria
+## Development Scripts
 
-### 1. Property Listing Endpoint
+```bash
+# Run code style fixes
+./vendor/bin/sail pint
 
--   ✅ Implement `/api/properties` endpoint
--   ✅ Return paginated results (25 items per page)
--   ✅ Include property details and location information
-
-### 2. Search Functionality
-
--   ✅ Filter properties by title
--   ✅ Filter properties by location
--   ✅ Support combined search criteria
--   ✅ Handle empty search results gracefully
-
-### 3. Sorting Functionality
-
--   ✅ Sort by price (ascending/descending)
--   ✅ Sort by date listed (ascending/descending)
--   ✅ Default sort by date_listed descending
--   ✅ Validate sort parameters
-
-### 4. Error Handling
-
--   ✅ Validate input parameters
--   ✅ Handle invalid search queries
--   ✅ Handle missing data scenarios
--   ✅ Handle database errors
--   ✅ Return appropriate HTTP status codes
-
-### 5. Testing Requirements
-
--   ✅ Comprehensive unit tests
--   ✅ Feature tests for API endpoints
--   ✅ Test all search combinations
--   ✅ Test sorting functionality
--   ✅ Test error scenarios
-
-## Contributing
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+# Run development server with hot reload
+./vendor/bin/sail dev
+```
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
