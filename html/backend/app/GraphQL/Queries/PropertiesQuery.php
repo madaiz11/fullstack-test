@@ -33,6 +33,7 @@ class PropertiesQuery
      */
     public function __invoke($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {
+        // TODO: Map to DTO
         $filter = $args['filter'] ?? [];
 
         // Validate filter
